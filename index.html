@@ -3,23 +3,253 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Petasus</title>
+  <title>Petasus: every account in its own space, in one Mac app</title>
+  <meta name="description" content="Petasus keeps your web apps in separate workspaces on your Mac, each with its own sign-ins, so you can be signed in to several accounts at once.">
+  <meta name="color-scheme" content="light dark">
   <style>
-    body { font: 16px/1.5 -apple-system, system-ui, sans-serif; max-width: 42rem; margin: 3rem auto; padding: 0 1rem;
-           color: #1d1d1f; background: #fff; }
-    h1 { font-size: 2rem; }
-    a { color: #0066cc; }
-    @media (prefers-color-scheme: dark) { body { color: #f5f5f7; background: #1c1c1e; } a { color: #66b3ff; } }
+    :root {
+      --bg: #faf9f7; --panel: #ffffff; --ink: #1a1a1c; --muted: #5a5a62; --line: #e3e1dc;
+      --accent: #1f4e8c; --accent-soft: #e9eff8; --on-accent: #ffffff;
+      --serif: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+      --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141416; --panel: #1b1b1e; --ink: #f0efec; --muted: #a6a6ae; --line: #2e2e33;
+        --accent: #8db8ff; --accent-soft: #1d2634; --on-accent: #0d1a2e;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--sans); }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+    .wrap { width: min(100% - 2.5rem, 68rem); margin-inline: auto; }
+    .skip { position: absolute; left: -999px; top: 0; background: var(--ink); color: var(--bg); padding: .5rem .8rem; }
+    .skip:focus { left: .5rem; top: .5rem; z-index: 10; }
+
+    header.top { border-bottom: 1px solid var(--line); }
+    header.top .wrap { display: flex; align-items: center; justify-content: space-between; padding-block: 1rem; }
+    .mark { font: 600 1.15rem/1 var(--serif); letter-spacing: .01em; color: var(--ink); text-decoration: none; }
+    nav a { color: var(--muted); text-decoration: none; margin-left: 1.5rem; font-size: .95rem; }
+    nav a:hover { color: var(--ink); text-decoration: underline; }
+
+    .hero { padding-block: 4.5rem 5rem; }
+    .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 3.5rem; align-items: center; }
+    h1 { font: 500 clamp(2.4rem, 5.2vw, 3.7rem)/1.08 var(--serif); letter-spacing: -.015em; margin: 0 0 1.25rem; }
+    .lede { font-size: 1.2rem; color: var(--muted); max-width: 34rem; margin: 0 0 2rem; }
+    .status { display: inline-block; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: .8rem 1rem; font-size: .95rem; }
+    .status strong { display: block; font-weight: 600; }
+    .status span { color: var(--muted); }
+    .hero .more { margin: 1.25rem 0 0; font-size: .95rem; }
+
+    /* An illustration of the window, drawn with plain boxes. */
+    .shot { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 18px 40px -12px rgba(0,0,0,.18); }
+    .shot .bar { display: flex; gap: 6px; padding: .6rem .75rem; border-bottom: 1px solid var(--line); background: var(--accent-soft); }
+    .shot .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: block; }
+    .shot .body { display: grid; grid-template-columns: 11.5rem 1fr; min-height: 21rem; }
+    .side { border-right: 1px solid var(--line); padding: .9rem .7rem; font-size: .82rem; background: var(--bg); }
+    .side h3 { margin: 0 0 .35rem .4rem; font: 600 .68rem/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .side ul { list-style: none; margin: 0 0 1.1rem; padding: 0; }
+    .side li { display: flex; align-items: center; gap: .5rem; padding: .32rem .45rem; border-radius: 6px; color: var(--ink); }
+    .side li.on { background: var(--accent-soft); font-weight: 600; }
+    .side .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+    .side .n { margin-left: auto; font-size: .7rem; background: var(--accent); color: var(--on-accent); border-radius: 9px; padding: 0 .4rem; line-height: 1.35; }
+    .pane { padding: 1.1rem 1.2rem; }
+    .pane .head { height: .8rem; width: 38%; background: var(--line); border-radius: 4px; margin-bottom: 1.1rem; }
+    .row { display: grid; grid-template-columns: 1.4rem 1fr; gap: .7rem; align-items: center; padding: .55rem 0; border-bottom: 1px solid var(--line); }
+    .row b { width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--accent-soft); display: block; }
+    .row s { display: block; height: .55rem; border-radius: 3px; background: var(--line); text-decoration: none; }
+    .row s + s { margin-top: .4rem; width: 62%; opacity: .6; }
+
+    section { padding-block: 4rem; border-top: 1px solid var(--line); }
+    .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 3rem; }
+    h2 { font: 500 1.7rem/1.2 var(--serif); margin: 0; letter-spacing: -.01em; }
+    .split p { margin: 0 0 1rem; max-width: 40rem; }
+    .split p:last-child { margin-bottom: 0; }
+    .keys { color: var(--muted); font-size: .95rem; }
+    kbd { font: .85em ui-monospace, "SF Mono", Menlo, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: .05em .4em; background: var(--panel); white-space: nowrap; }
+    .apps { columns: 3 13rem; column-gap: 2rem; margin: 0 0 1rem; padding: 0; list-style: none; font-size: .98rem; }
+    .apps li { break-inside: avoid; padding: .12rem 0; }
+    .fine { color: var(--muted); font-size: .88rem; }
+
+    details { border-top: 1px solid var(--line); padding: .95rem 0; }
+    details:last-of-type { border-bottom: 1px solid var(--line); }
+    summary { cursor: pointer; font-weight: 600; list-style-position: outside; }
+    details p { margin: .6rem 0 0; color: var(--muted); max-width: 40rem; }
+
+    footer { border-top: 1px solid var(--line); padding-block: 2.5rem 3rem; font-size: .92rem; color: var(--muted); }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; }
+    footer p { margin: 0; max-width: 34rem; }
+
+    @media (max-width: 52rem) {
+      .hero { padding-block: 2.5rem 3rem; }
+      .hero .wrap, .split { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+      .shot .body { grid-template-columns: 9.5rem 1fr; min-height: 17rem; }
+      section { padding-block: 2.75rem; }
+      nav a { margin-left: 1rem; }
+    }
+    @media (max-width: 30rem) { nav a:nth-child(1) { display: none; } .shot .body { grid-template-columns: 1fr; } .side { border-right: 0; border-bottom: 1px solid var(--line); } }
   </style>
 </head>
 <body>
-  <main>
-    <h1>Petasus</h1>
-    <p>A Mac app that keeps all your web apps and accounts in separate workspaces.</p>
-    <ul>
-      <li><a href="sign-in-help.html">Signing in to your accounts</a></li>
-      <li><a href="privacy.html">Privacy policy</a></li>
-    </ul>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <div class="wrap">
+      <a class="mark" href="./">Petasus</a>
+      <nav aria-label="Main">
+        <a href="#workspaces">What it does</a>
+        <a href="#privacy">Privacy</a>
+        <a href="sign-in-help.html">Signing in</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="hero">
+      <div class="wrap">
+        <div>
+          <h1>Three Gmail accounts. One window.</h1>
+          <p class="lede">Petasus is a Mac app that keeps your web apps in separate workspaces, each with its own sign-ins. Your work, your clients and your personal accounts stay apart, and each is one keystroke away.</p>
+          <p class="status"><strong>Free for Mac</strong><span>Apple silicon, macOS 15.4 or later. The first release is not out yet.</span></p>
+          <p class="more"><a href="sign-in-help.html">How signing in works</a></p>
+        </div>
+        <div class="shot" role="img" aria-label="Illustration of the Petasus window: a sidebar listing three workspaces and five apps with unread counts, and an inbox on the right.">
+          <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="body" aria-hidden="true">
+            <div class="side">
+              <h3>Workspaces</h3>
+              <ul>
+                <li class="on"><span class="dot" style="background:#1f4e8c"></span>Studio<span class="n">6</span></li>
+                <li><span class="dot" style="background:#b8541c"></span>Northwind</li>
+                <li><span class="dot" style="background:#2e8b57"></span>Personal<span class="n">2</span></li>
+              </ul>
+              <h3>Apps</h3>
+              <ul>
+                <li class="on">Gmail<span class="n">4</span></li>
+                <li>Calendar</li>
+                <li>Slack<span class="n">2</span></li>
+                <li>Notion</li>
+                <li>Linear</li>
+              </ul>
+            </div>
+            <div class="pane">
+              <div class="head"></div>
+              <div class="row"><b></b><div><s></s><s></s></div></div>
+              <div class="row"><b></b><div><s></s><s></s></div></div>
+              <div class="row"><b></b><div><s></s><s></s></div></div>
+              <div class="row"><b></b><div><s></s><s></s></div></div>
+              <div class="row"><b></b><div><s></s><s></s></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="workspaces">
+      <div class="wrap split">
+        <h2>Separate worlds in one window</h2>
+        <div>
+          <p>Every workspace has its own cookies, logins and site data, kept apart by macOS itself. Be signed in to your work Gmail, a client's Gmail and your own at the same moment. There is no profile to switch and no wondering which browser you were in.</p>
+          <p>Need two copies of the same app in one workspace? They get separate sign-ins too. Want two apps to share one login? You can choose that explicitly.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="light">
+      <div class="wrap split">
+        <h2>Light enough to leave open</h2>
+        <div>
+          <p>Petasus is a native Mac app built on the system's own web engine, not a bundled copy of Chrome. An app loads when you first open it, goes to sleep when you stop using it, and wakes up where you left it, scroll position included.</p>
+          <p>Six apps stay awake by default. You choose the number, and you can pin the ones that should never sleep.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="notice">
+      <div class="wrap split">
+        <h2>See what is waiting</h2>
+        <div>
+          <p>Unread counts appear beside each app, on each workspace and on the Dock icon. Web notifications arrive as ordinary Mac notifications, and a click takes you to the right app in the right workspace. Mute one app, or set quiet hours for all of them.</p>
+          <p>Mail apps can optionally show exact counts even while they are asleep.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="move">
+      <div class="wrap split">
+        <h2>Quick to get around</h2>
+        <div>
+          <p><kbd>⌘1</kbd> to <kbd>⌘9</kbd> switch apps. <kbd>⌥⌘1</kbd> to <kbd>⌥⌘9</kbd> switch workspaces. <kbd>⌘K</kbd> jumps to any app or any page you have visited, across every account at once.</p>
+          <p class="keys">An address field is always there, so any web page can open inside the workspace you are in. Petasus can also be your Mac's default browser.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="apps">
+      <div class="wrap split">
+        <h2>59 apps ready, anything else by address</h2>
+        <div>
+          <ul class="apps">
+            <li>Gmail</li><li>Google Calendar</li><li>Google Drive</li><li>Outlook</li><li>Microsoft Teams</li>
+            <li>SharePoint</li><li>Slack</li><li>Discord</li><li>WhatsApp</li><li>Telegram</li><li>Zoom</li>
+            <li>Notion</li><li>Linear</li><li>Asana</li><li>Trello</li><li>Jira</li><li>Confluence</li>
+            <li>ClickUp</li><li>Airtable</li><li>GitHub</li><li>Figma</li><li>Miro</li><li>HubSpot</li>
+            <li>Salesforce</li><li>Zendesk</li><li>Mailchimp</li><li>QuickBooks</li><li>DocuSign</li>
+            <li>Proton Mail</li><li>BambooHR</li><li>Gusto</li><li>Loom</li><li>ChatGPT</li><li>Claude</li>
+          </ul>
+          <p>And more. The list can grow without an app update. A site that is not on it works as a custom address.</p>
+          <p class="fine">Product names belong to their owners. Petasus is not affiliated with them.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy">
+      <div class="wrap split">
+        <h2>Quiet by design</h2>
+        <div>
+          <p>There is no account to create and no analytics. Your history, cookies and settings stay on your Mac. Ads and trackers are blocked with the EasyList and EasyPrivacy lists.</p>
+          <p>One optional extra is off until you turn it on: a weekly anonymous performance report. Before you switch it on, Petasus shows you exactly what it contains. It has versions, counts and timings only, never addresses, titles, emails or the names of your apps.</p>
+          <p><a href="privacy.html">Read the privacy policy</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="questions">
+      <div class="wrap split">
+        <h2>Questions</h2>
+        <div>
+          <details>
+            <summary>What does it cost?</summary>
+            <p>Nothing for now. If paid plans ever arrive, they will be announced before they start.</p>
+          </details>
+          <details>
+            <summary>Which Macs does it run on?</summary>
+            <p>Macs with Apple silicon, on macOS 15.4 or later.</p>
+          </details>
+          <details>
+            <summary>How is this different from browser profiles?</summary>
+            <p>Profiles also keep accounts apart, but each one is its own window. Petasus puts every account's apps side by side in one window, with unread counts, notifications and search across all of them.</p>
+          </details>
+          <details>
+            <summary>Can it read my email?</summary>
+            <p>No. Petasus shows the sites you open the way a browser does. The optional exact counts for mail use read-only access to label or folder totals, never to messages.</p>
+          </details>
+          <details>
+            <summary>Do passkeys and security keys work?</summary>
+            <p>Not yet. Apple has to approve browser apps for that, and Petasus will use it once it does. Until then you can sign in with a password and a code, or open the page in your default browser. <a href="sign-in-help.html">The details are here.</a></p>
+          </details>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <footer>
+    <div class="wrap">
+      <p>Petasus is a Mac app for keeping many accounts apart.</p>
+      <p><a href="privacy.html">Privacy policy</a> &middot; <a href="sign-in-help.html">Signing in</a> &middot; <a href="mailto:support@criticalcreative.ca">support@criticalcreative.ca</a></p>
+    </div>
+  </footer>
 </body>
 </html>
