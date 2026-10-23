@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Signing in to your accounts</title>
+  <style>
+    body { font: 16px/1.5 -apple-system, system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1rem;
+           color: #1d1d1f; background: #fff; }
+    h1 { font-size: 1.8rem; } h2 { font-size: 1.2rem; margin-top: 2rem; }
+    .status { padding: .75rem 1rem; border-radius: .5rem; background: #eef3fb; }
+    @media (prefers-color-scheme: dark) { body { color: #f5f5f7; background: #1c1c1e; }
+      .status { background: #2a3342; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Signing in to your accounts</h1>
+    <p>Petasus keeps each account&#x27;s sign-in separate in its own workspace. Most accounts sign in exactly as they do in your browser.</p>
+    <h2>What works</h2>
+    <ul>
+      <li>Your password, plus a code from an authenticator app or a text message (2-step verification).</li>
+      <li>Phone prompts, where you tap Yes on your phone to approve the sign-in.</li>
+      <li>Codes and magic links sent to your email.</li>
+      <li>&quot;Continue with Google&quot; and &quot;Continue with Microsoft&quot; buttons on other sites.</li>
+      <li>Passwords saved in iCloud Keychain or a password manager, when macOS offers them for the page.</li>
+    </ul>
+    <h2>What needs passkeys or a security key</h2>
+    <ul>
+      <li>Google accounts in Google&#x27;s Advanced Protection Program.</li>
+      <li>Company or school accounts whose sign-in policy requires &quot;phishing-resistant&quot; methods.</li>
+      <li>Accounts where a security key is the only way to complete 2-step verification.</li>
+    </ul>
+    <p class="status" id="passkey-status">Passkeys and security keys are coming soon.</p>
+    <h2>If a site asks for a passkey or security key</h2>
+    <ol>
+      <li>Choose another sign-in method on the site if it offers one (password with a code, or a phone prompt).</li>
+      <li>Or use &quot;Open in default browser&quot; in the bar Petasus shows, sign in there, and come back.</li>
+      <li>If your company requires passkeys, ask your administrator which other method is allowed until Petasus supports them.</li>
+    </ol>
+  </main>
+</body>
+</html>
