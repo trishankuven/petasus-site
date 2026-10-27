@@ -4,17 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Signing in to your accounts</title>
-  <style>
-    body { font: 16px/1.5 -apple-system, system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1rem;
-           color: #1d1d1f; background: #fff; }
-    h1 { font-size: 1.8rem; } h2 { font-size: 1.2rem; margin-top: 2rem; }
-    .status { padding: .75rem 1rem; border-radius: .5rem; background: #eef3fb; }
-    @media (prefers-color-scheme: dark) { body { color: #f5f5f7; background: #1c1c1e; }
-      .status { background: #2a3342; } }
-  </style>
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="site.css">
 </head>
-<body>
-  <main>
+<body class="doc-page">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Petasus home">
+        <img class="mark" src="assets/mark.png" alt="">
+        <picture><source media="(prefers-color-scheme: dark)" srcset="assets/wordmark-ko.png"><img class="word" src="assets/wordmark.png" alt="Petasus"></picture>
+      </a>
+      <nav aria-label="Main">
+        <a href="./#workspaces">What it does</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="sign-in-help.html" aria-current="page">Signing in</a>
+        <a class="btn" href="./#get">Get Petasus</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="doc"><div class="wrap">
     <h1>Signing in to your accounts</h1>
     <p>Petasus keeps each account&#x27;s sign-in separate in its own workspace. Most accounts sign in exactly as they do in your browser.</p>
     <h2>What works</h2>
@@ -38,6 +50,22 @@
       <li>Or use &quot;Open in default browser&quot; in the bar Petasus shows, sign in there, and come back.</li>
       <li>If your company requires passkeys, ask your administrator which other method is allowed until Petasus supports them.</li>
     </ol>
-  </main>
+  </div></main>
+  <footer>
+    <div class="wrap">
+      <div>
+        <a class="brand" href="./" aria-label="Petasus home"><img class="mark" src="assets/mark.png" alt=""><picture><source media="(prefers-color-scheme: dark)" srcset="assets/wordmark-ko.png"><img class="word" src="assets/wordmark.png" alt="Petasus"></picture></a>
+        <p>A Mac app for keeping many accounts apart.</p>
+      </div>
+      <div>
+        <h4>Petasus</h4>
+        <ul><li><a href="./#workspaces">What it does</a></li><li><a href="./#questions">Questions</a></li><li><a href="sign-in-help.html">Signing in</a></li></ul>
+      </div>
+      <div>
+        <h4>Trust</h4>
+        <ul><li><a href="privacy.html">Privacy policy</a></li><li><a href="mailto:support@criticalcreative.ca">support@criticalcreative.ca</a></li></ul>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
